@@ -4234,12 +4234,11 @@ function aa:WrapGeneration(g, h)
 		end
 		local u, v, x = pcall(g, o, p, ...)
 		if u == false then
-			if r then
-				if i[r] then
-					return
-				end
-				i[r] = v
+			local w = r or o
+			if i[w] then
+				return
 			end
+			i[w] = v
 			self:VisualError(o, r, v)
 			self:Error("Class:", v)
 			self:Error(debug.traceback())
