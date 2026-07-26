@@ -1,4 +1,5 @@
 made by depso
+JhonaDev139 está tentando corrigir isso pois não encontrei a source original :(
 # Dear ReGui
 Dear ReGui is a retained dear ImGui library remake designed to be used on Roblox!
 This is perfect for beginners and performance.
