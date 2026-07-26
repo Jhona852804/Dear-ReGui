@@ -4216,7 +4216,18 @@ function aa:VisualError(g, h, i)
 		self:Error("Class:", i)
 		return
 	end
-	g:Error({ Parent = h, Text = i })
+	if self._InVisualError then
+		self:Error("Class:", i)
+		return
+	end
+	self._InVisualError = true
+	local ok = pcall(function()
+		g:Error({ Parent = h, Text = i })
+	end)
+	self._InVisualError = false
+	if not ok then
+		self:Error("Class:", i)
+	end
 end
 function aa:WrapGeneration(g, h)
 	local i, m, n = self._ErrorCache, h.Base, h.IgnoreDefaults
@@ -4234,11 +4245,12 @@ function aa:WrapGeneration(g, h)
 		end
 		local u, v, x = pcall(g, o, p, ...)
 		if u == false then
-			local w = r or o
-			if i[w] then
-				return
+			if r then
+				if i[r] then
+					return
+				end
+				i[r] = v
 			end
-			i[w] = v
 			self:VisualError(o, r, v)
 			self:Error("Class:", v)
 			self:Error(debug.traceback())
