@@ -1481,10 +1481,13 @@ function ReGui:WrapGeneration(Function, Data: table)
 
 		--// Check for errors
 		if Success == false then
-			if Parent then
-				if ErrorCache[Parent] then return end
-				ErrorCache[Parent] = Class
-			end
+			--// Fall back to the Canvas itself as the cache key when there's no
+			--// RawObject, otherwise elements without one (e.g. the error label
+			--// created below) would retry their failing creation forever and
+			--// overflow the stack instead of reporting the error once.
+			local ErrorKey = Parent or Canvas
+			if ErrorCache[ErrorKey] then return end
+			ErrorCache[ErrorKey] = Class
 
 			--// Create visual error message
 			self:VisualError(Canvas, Parent, Class)
