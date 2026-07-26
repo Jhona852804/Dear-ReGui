@@ -1433,11 +1433,28 @@ function ReGui:VisualError(Canvas, Parent, Message: string)
 		return
 	end
 
+	--// Guard against recursing into ourselves: if creating the error label
+	--// below also fails (e.g. the same root cause breaks every element),
+	--// it would call VisualError again, which would try again, forever,
+	--// until the stack overflows. Bail out to a plain log message instead.
+	if self._InVisualError then
+		self:Error("Class:", Message)
+		return
+	end
+
 	--// Create error label
-	Canvas:Error({
-		Parent = Parent,
-		Text = Message
-	})
+	self._InVisualError = true
+	local Ok = pcall(function()
+		Canvas:Error({
+			Parent = Parent,
+			Text = Message
+		})
+	end)
+	self._InVisualError = false
+
+	if not Ok then
+		self:Error("Class:", Message)
+	end
 end
 
 function ReGui:WrapGeneration(Function, Data: table)
@@ -1481,13 +1498,10 @@ function ReGui:WrapGeneration(Function, Data: table)
 
 		--// Check for errors
 		if Success == false then
-			--// Fall back to the Canvas itself as the cache key when there's no
-			--// RawObject, otherwise elements without one (e.g. the error label
-			--// created below) would retry their failing creation forever and
-			--// overflow the stack instead of reporting the error once.
-			local ErrorKey = Parent or Canvas
-			if ErrorCache[ErrorKey] then return end
-			ErrorCache[ErrorKey] = Class
+			if Parent then
+				if ErrorCache[Parent] then return end
+				ErrorCache[Parent] = Class
+			end
 
 			--// Create visual error message
 			self:VisualError(Canvas, Parent, Class)
