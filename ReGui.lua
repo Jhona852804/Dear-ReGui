@@ -3562,9 +3562,9 @@ function aa:CheckImportState()
 		return
 	end
 	local g = self.PrefabsId
-	local h = ad:CheckAssetUrl(g)
 	local i, m = pcall(function()
-		return ad:NewReference(d:LoadLocalAsset(h))
+		local n = d:LoadAsset(g)
+		return ad:NewReference(n:GetChildren()[1])
 	end)
 	self:Init({ Prefabs = i and m or nil })
 end
