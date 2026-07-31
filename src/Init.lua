@@ -291,11 +291,20 @@ function ReGui:CheckImportState()
 	if self.Initialised then return end
 
 	--// Import prefabs
+	--// NOTE: InsertService:LoadAsset() is blocked by Roblox from being called
+	--// client-side (LocalScript) in a live game -- it only works in Studio/
+	--// on the server. game:GetObjects() is the client-permitted equivalent
+	--// for loading a published asset by id, so it's used here instead.
 	local PrefabsId = self.PrefabsId
+	local PrefabsAssetUrl = Wrappers:CheckAssetUrl(PrefabsId)
 	local Success, Prefabs = pcall(function()
-		local Asset = InsertService:LoadAsset(PrefabsId)
-		return Wrappers:NewReference(Asset:GetChildren()[1])
+		local Objects = game:GetObjects(PrefabsAssetUrl)
+		return Wrappers:NewReference(Objects[1])
 	end)
+
+	if not Success then
+		warn(`[ReGui] Failed to load prefabs: {Prefabs}`)
+	end
 
 	--// Automatically load ReGui
 	self:Init({
