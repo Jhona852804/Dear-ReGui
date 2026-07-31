@@ -3562,10 +3562,14 @@ function aa:CheckImportState()
 		return
 	end
 	local g = self.PrefabsId
+	local h = ad:CheckAssetUrl(g)
 	local i, m = pcall(function()
-		local n = d:LoadAsset(g)
-		return ad:NewReference(n:GetChildren()[1])
+		local n = game:GetObjects(h)
+		return ad:NewReference(n[1])
 	end)
+	if not i then
+		warn(`[ReGui] Failed to load prefabs: {m}`)
+	end
 	self:Init({ Prefabs = i and m or nil })
 end
 function aa:GetVersion()
