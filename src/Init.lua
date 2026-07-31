@@ -292,9 +292,9 @@ function ReGui:CheckImportState()
 
 	--// Import prefabs
 	local PrefabsId = self.PrefabsId
-	local PrefabsAssetUrl = Wrappers:CheckAssetUrl(PrefabsId)
 	local Success, Prefabs = pcall(function()
-		return Wrappers:NewReference(InsertService:LoadLocalAsset(PrefabsAssetUrl))
+		local Asset = InsertService:LoadAsset(PrefabsId)
+		return Wrappers:NewReference(Asset:GetChildren()[1])
 	end)
 
 	--// Automatically load ReGui
